@@ -1,0 +1,70 @@
+<?php
+    require_once "get_coords.php";
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+  <script src="https://cdn.maptiler.com/maptiler-sdk-js/v1.2.0/maptiler-sdk.umd.min.js"></script>
+  <link href="https://cdn.maptiler.com/maptiler-sdk-js/v1.2.0/maptiler-sdk.css" rel="stylesheet" />
+  
+</head>
+<style>
+    #map{
+        position:absolute;
+        left:0;
+        right:0;
+        top:0;
+        bottom:0;
+    }
+</style>
+<body>
+    <div id="map"></div>
+    <script>
+        maptilersdk.config.apiKey = 'YOUR_MAPTILER_API_KEY_HERE';
+        const map = new maptilersdk.Map({
+            container: 'map', // container's id or the HTML element to render the map
+            style: maptilersdk.MapStyle.STREETS,
+            center: [16.62662018, 49.2125578], // starting position [lng, lat]
+            zoom: 14, // starting zoom
+      });
+        L.tileLayer('https://api.maptiler.com/maps/streets-v2/{z}/{x}/{y}.png?key=zu81qp5yGvbAgHoNquf3',
+        {
+            attribution: '<a href="https://www.maptiler.com/copyright/" target="_blank">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright" target="_blank">&copy; OpenStreetMap contributors</a>',
+        }).addTo(map);
+        var  officeIcon = L.icon ({
+            iconUrl: 'https://i.postimg.cc/qM2CCSJh/office.png',
+            iconSize: [38, 55],
+        });
+        var  distIcon = L.icon ({
+            iconUrl: 'https://i.postimg.cc/WpkdQCJW/dist.png',
+            iconSize: [38, 55],
+        });
+        <?php
+            foreach($points as $point){
+                if($point[3]!=0){
+                    echo("let marker".$point[0]."=L.marker([".$point[4].", ".$point[5]."], {icon: officeIcon}).addTo(map);");
+                }else if($point[3]==0){
+                    echo("let marker".$point[0]."=L.marker([".$point[4].", ".$point[5]."], {icon: distIcon}).addTo(map);");
+                }
+            };
+        ?>
+        L.Control.Watermark=L.Control.extend({
+            onAdd:function(map){
+                let img=L.DomUtil.create('img');
+                img.src='https://i.postimg.cc/9FHpDv3K/logo-1.png';
+                img.style.width='200px';
+                return img;
+            },
+            onRemove:function(map){}
+        });
+        L.control.watermark=function(opts){
+            return new L.Control.Watermark(opts);
+        }
+
+        L.control.watermark({position:'bottomleft'}).addTo(map);
+    </script>
+</body>
+</html>
